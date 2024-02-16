@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: j-user-server
+  namespace: prod
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: j-user-server
+  template:
+    metadata:
+      labels:
+        app: j-user-server
+    spec:
+      containers:
+        - name: j-user-container
+          image: jmg173/j-user:0.0.1
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: prod
+          envFrom:
+            - configMapRef:
+                name: j-user-pg-config
+            - secretRef:
+                name: j-user-pg-secret
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh","-c","sleep 10"] #필수는 아니다, 롤링업데이트로 파드 교체될때 요청들 정리되게끔 강제적으로 10초 준다.
+#          readinessProbe: # 스프링 시큐리티 수정 필요
+#            httpGet:
+#              path: user/healthcheck/ready
+#              port: 8080
+#            initialDelaySeconds: 30
+#            periodSeconds: 1
+#            successThreshold: 1
+#            failureThreshold: 3
+#          livenessProbe:
+#            httpGet:
+#              path: user/healthcheck/live
+#              port: 8080
+#            initialDelaySeconds: 30
+#            periodSeconds: 1
+#            failureThreshold: 7
