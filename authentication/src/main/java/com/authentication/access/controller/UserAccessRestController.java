@@ -1,16 +1,15 @@
 package com.authentication.access.controller;
 
-import com.authentication.access.dto.request.UserAccessRequestDto;
 import com.authentication.access.dto.response.UserAccessResponseDto;
 import com.authentication.access.service.UserAccessService;
-import com.authentication.common.dto.CommonResponseDto;
+
+import com.common.dto.CommonResponseDto;
 import com.common.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;

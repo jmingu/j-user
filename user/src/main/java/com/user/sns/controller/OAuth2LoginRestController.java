@@ -1,6 +1,7 @@
 package com.user.sns.controller;
 
-import com.user.common.dto.CommonResponseDto;
+
+import com.common.dto.CommonResponseDto;
 import com.user.sns.dto.response.LoginTokenDto;
 import com.user.sns.service.OAuth2LoginService;
 import lombok.RequiredArgsConstructor;

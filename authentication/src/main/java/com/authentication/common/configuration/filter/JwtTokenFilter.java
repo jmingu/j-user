@@ -2,8 +2,9 @@ package com.authentication.common.configuration.filter;
 
 import com.authentication.access.repository.UserEntityRepository;
 import com.authentication.common.configuration.util.JWTUtil;
-import com.authentication.common.exception.JApplicationException;
+
 import com.common.entity.UserEntity;
+import com.common.exception.JApplicationException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
