@@ -1,4 +1,4 @@
-package com.user.sns.entity;
+package com.common.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -27,5 +27,5 @@ public class OrganizationEntity extends BaseEntity {
     private LocalDateTime organizationEndDate;
 
     @OneToMany(mappedBy = "organizationEntity")
-    private List<Oauth2UserEntity> oauth2UserEntity;
+    private List<UserEntity> userEntity;
 }

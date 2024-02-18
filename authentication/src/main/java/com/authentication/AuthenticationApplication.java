@@ -1,19 +1,17 @@
-package com.user;
+package com.authentication;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication(
-        scanBasePackages = { "com.user", "com.common" }
+        scanBasePackages = { "com.authentication", "com.common" }
 )
 @EntityScan(basePackages = {"com.common.entity"})
-@EnableFeignClients // feign
-public class UserApplication {
+public class AuthenticationApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(UserApplication.class, args);
+        SpringApplication.run(AuthenticationApplication.class, args);
     }
 
 }

@@ -1,8 +1,5 @@
-package com.user.sns.entity;
-
+package com.common.entity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,10 +7,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name="tb_user")
-public class Oauth2UserEntity extends BaseEntity {
+public class UserEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer userId;
+    private Long userId;
 
     private String loginId;
 
@@ -31,7 +28,7 @@ public class Oauth2UserEntity extends BaseEntity {
     @JoinColumn(name = "organization_id")
     private OrganizationEntity organizationEntity;
 
-    public Oauth2UserEntity(String loginId, String userName, String password, String email, String gender, String loginType, OrganizationEntity organizationEntity) {
+    public UserEntity(String loginId, String userName, String password, String email, String gender, String loginType, OrganizationEntity organizationEntity) {
         this.loginId = loginId;
         this.userName = userName;
         this.password = password;

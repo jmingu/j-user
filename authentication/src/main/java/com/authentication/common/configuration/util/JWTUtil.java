@@ -1,9 +1,7 @@
-package com.user.common.configuration.util;
+package com.authentication.common.configuration.util;
 
-import com.common.entity.UserEntity;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,32 +19,6 @@ public class JWTUtil {
     @Value("${jwt.secret-key}")
     private String secretKey;
 
-    /**
-     * 토큰생성
-     */
-    public String makeAuthToken(UserEntity userEntity, int tokeTime) {
-        Claims claims = Jwts.claims();
-        claims.put("loginId", userEntity.getLoginId());
-        claims.put("userName", userEntity.getUserName());
-
-        // 현재 날짜와 시간 가져오기
-        Date currentDate = new Date();
-
-        // Calendar 객체 생성 및 현재 날짜 및 시간으로 설정
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(currentDate);
-        // 분 추가
-        calendar.add(Calendar.MINUTE, tokeTime);
-        // 변경된 날짜 및 시간 가져오기
-        Date newDate = calendar.getTime();
-
-        return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(currentDate) // 발생시간
-                .setExpiration(newDate) // 만료시간
-                .signWith(getKey(secretKey), SignatureAlgorithm.HS256)
-                .compact(); // String으로 만듬 base64로 인코딩;
-    }
 
     // Key값 만들기
     private Key getKey(String key) {
@@ -73,9 +45,9 @@ public class JWTUtil {
 
     }
 
-    // 토큰에서 이름 가져오기
+    // 토큰에서 정보 가져오기
     public String getUserName(String token, String key) {
-        return extractClaims(token, key).get("userName", String.class); //body에서 userName가져오기
+        return extractClaims(token, key).get("loginId", String.class); //body에서 loginId가져오기
     }
 
 

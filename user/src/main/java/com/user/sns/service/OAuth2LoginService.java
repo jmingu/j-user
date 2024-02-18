@@ -1,16 +1,16 @@
 package com.user.sns.service;
 
+import com.common.entity.OrganizationEntity;
+import com.common.entity.UserEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.user.common.properties.Oauth2NaverRegistrationProperties;
-import com.user.sns.dto.response.LoginTokenDto;
+import com.user.common.configuration.util.JWTUtil;
 import com.user.common.feign.NidNaverFeignClient;
 import com.user.common.feign.OpenApiNaverFeignClient;
+import com.user.common.properties.Oauth2NaverRegistrationProperties;
 import com.user.sns.dto.OAuth2NaverLoginResultDto;
 import com.user.sns.dto.OAuth2NaverLoginTokenDto;
-import com.user.sns.entity.Oauth2UserEntity;
-import com.user.sns.entity.OrganizationEntity;
+import com.user.sns.dto.response.LoginTokenDto;
 import com.user.sns.repository.UserEntityRepository;
-import com.user.common.configuration.util.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -66,7 +66,7 @@ public class OAuth2LoginService {
                     .organizationName("기본")
                     .build();
 
-            Oauth2UserEntity oauth2UserEntity = new Oauth2UserEntity(
+            UserEntity userEntity = new UserEntity(
                     oAuth2NaverLoginResultDto.getResponse().getId(),
                     oAuth2NaverLoginResultDto.getResponse().getName(),
                     oAuth2NaverLoginResultDto.getResponse().getEmail(),
@@ -77,15 +77,15 @@ public class OAuth2LoginService {
             );
 
             // 회원가입
-            userEntityRepository.save(oauth2UserEntity);
+            userEntityRepository.save(userEntity);
         }
 
-        Oauth2UserEntity oauth2UserEntity = userEntityRepository.findByLoginId(oAuth2NaverLoginResultDto.getResponse().getId()).get();
+        UserEntity userEntity = userEntityRepository.findByLoginId(oAuth2NaverLoginResultDto.getResponse().getId()).get();
 
         // 엑세스토큰발행(1시간)
-        String accessToken = jwtUtil.makeAuthToken(oauth2UserEntity, expiredTime);
+        String accessToken = jwtUtil.makeAuthToken(userEntity, expiredTime);
         // 리프레시 토큰발행(1달)
-        String refreshToken = jwtUtil.makeAuthToken(oauth2UserEntity, refreshTime);
+        String refreshToken = jwtUtil.makeAuthToken(userEntity, refreshTime);
 
         LoginTokenDto loginTokenDto = new LoginTokenDto(accessToken, refreshToken);
 

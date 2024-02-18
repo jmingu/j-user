@@ -1,4 +1,5 @@
-package com.user.sns.repository;
+package com.authentication.access.repository;
+
 
 import com.common.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
