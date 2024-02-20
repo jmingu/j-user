@@ -1,6 +1,6 @@
 server:
   servlet:
-    context-path: /authentication
+    context-path: /api
   port: 8079
 spring:
   profiles:

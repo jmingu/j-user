@@ -1,7 +1,7 @@
 package com.authentication.common.configuration.filter;
 
 import com.authentication.access.repository.UserEntityRepository;
-import com.authentication.common.configuration.util.JWTUtil;
+import com.authentication.common.configuration.util.JwtUtil;
 
 import com.common.entity.UserEntity;
 import com.common.exception.JApplicationException;
@@ -20,7 +20,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Optional;
 
 
 // OncePerRequestFilter => 매 요청때마다 필터를 씌울것이다
@@ -29,7 +28,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class JwtTokenFilter extends OncePerRequestFilter {
 
-    private final JWTUtil jwtUtil;
+    private final JwtUtil jwtUtil;
     @Value("${jwt.secret-key}")
     private String secretKey;
 
@@ -37,7 +36,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
 
         // 헤더 정보
         final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
@@ -60,7 +58,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 return;
             }
 
-           // 토큰에서 유저네임 가저온다
+           // 토큰에서 loginId 가저온다
             String loginId = jwtUtil.getUserName(token, secretKey);
 
             // 아이디 유효한다 확인한다.
@@ -74,7 +72,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             // authorities => 권한
 
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    userEntity, null, null
+                    loginId, null, null
             );
 
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

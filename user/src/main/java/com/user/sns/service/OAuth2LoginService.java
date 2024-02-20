@@ -3,10 +3,12 @@ package com.user.sns.service;
 import com.common.entity.OrganizationEntity;
 import com.common.entity.UserEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.user.common.configuration.util.JWTUtil;
+import com.user.common.feign.JwtTokenFeignClient;
 import com.user.common.feign.NidNaverFeignClient;
 import com.user.common.feign.OpenApiNaverFeignClient;
 import com.user.common.properties.Oauth2NaverRegistrationProperties;
+import com.user.sns.dto.JwtTokenUserDto;
+import com.user.sns.dto.JwtTokenUserResultDto;
 import com.user.sns.dto.OAuth2NaverLoginResultDto;
 import com.user.sns.dto.OAuth2NaverLoginTokenDto;
 import com.user.sns.dto.response.LoginTokenDto;
@@ -26,13 +28,11 @@ public class OAuth2LoginService {
 
     private final Oauth2NaverRegistrationProperties oauth2NaverRegistrationProperties;
     private final UserEntityRepository userEntityRepository;
-    private final JWTUtil jwtUtil;
-    @Value("${jwt.token.expired-time}")
-    private int expiredTime;
-    @Value("${jwt.token.expired-refresh-time}")
-    private int refreshTime;
+
     private final NidNaverFeignClient nidNaverFeignClient;
     private final OpenApiNaverFeignClient openApiNaverFeignClient;
+
+    private final JwtTokenFeignClient jwtTokenFeignClient;
     @Transactional
     public LoginTokenDto getToken(String code, String state) throws Exception {
 
@@ -82,13 +82,14 @@ public class OAuth2LoginService {
 
         UserEntity userEntity = userEntityRepository.findByLoginId(oAuth2NaverLoginResultDto.getResponse().getId()).get();
 
-        // 엑세스토큰발행(1시간)
-        String accessToken = jwtUtil.makeAuthToken(userEntity, expiredTime);
-        // 리프레시 토큰발행(1달)
-        String refreshToken = jwtUtil.makeAuthToken(userEntity, refreshTime);
+        JwtTokenUserDto jwtTokenUserDto = JwtTokenUserDto.builder()
+                .loginId(userEntity.getLoginId())
+                .userName(userEntity.getUserName())
+                .build();
 
-        LoginTokenDto loginTokenDto = new LoginTokenDto(accessToken, refreshToken);
+        ResponseEntity<JwtTokenUserResultDto> jwtToken = jwtTokenFeignClient.getJwtToken(jwtTokenUserDto);
 
-        return loginTokenDto;
+
+        return jwtToken.getBody().getResult();
     }
 }

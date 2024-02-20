@@ -1,6 +1,6 @@
 server:
   servlet:
-    context-path: /user
+    context-path: /api
   port: 8080
 spring:
   profiles:
@@ -27,12 +27,6 @@ spring:
       - oauth2
       - common
       - service
-
-jwt:
-  secret-key: jmg_project_application_secret_key  #256bit 넘어야 한다
-  token:
-    expired-time: 60 #60분
-    expired-refresh-time: 10080 #7일
 
 logging:
   level:

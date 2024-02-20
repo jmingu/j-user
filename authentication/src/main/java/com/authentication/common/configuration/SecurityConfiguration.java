@@ -30,7 +30,7 @@ public class SecurityConfiguration {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(request -> request
-//                        .requestMatchers("/user/**").permitAll()
+                        .requestMatchers("/jwt/**").permitAll()
                         .requestMatchers("/healthcheck/**").permitAll()
                         .anyRequest().authenticated()
                 )

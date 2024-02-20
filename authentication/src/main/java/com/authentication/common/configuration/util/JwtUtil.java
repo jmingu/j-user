@@ -1,7 +1,9 @@
 package com.authentication.common.configuration.util;
 
+import com.common.entity.UserEntity;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,13 +13,44 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Map;
+import java.util.Objects;
 
 @Component
 @Slf4j
-public class JWTUtil {
+public class JwtUtil {
 
     @Value("${jwt.secret-key}")
     private String secretKey;
+
+    /**
+     * 토큰생성
+     */
+    public String makeAuthToken(Map<String, Object> userClaims, int tokeTime) {
+        Claims claims = Jwts.claims();
+
+        for (Map.Entry<String, Object> entrySet : userClaims.entrySet()) {
+            claims.put(entrySet.getKey(), entrySet.getValue());
+        }
+
+        // 현재 날짜와 시간 가져오기
+        Date currentDate = new Date();
+
+        // Calendar 객체 생성 및 현재 날짜 및 시간으로 설정
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(currentDate);
+        // 분 추가
+        calendar.add(Calendar.MINUTE, tokeTime);
+        // 변경된 날짜 및 시간 가져오기
+        Date newDate = calendar.getTime();
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(currentDate) // 발생시간
+                .setExpiration(newDate) // 만료시간
+                .signWith(getKey(secretKey), SignatureAlgorithm.HS256)
+                .compact(); // String으로 만듬 base64로 인코딩;
+    }
 
 
     // Key값 만들기
@@ -32,9 +65,7 @@ public class JWTUtil {
     public boolean isExpired(String token, String key) {
         // 토큰 시간확인
         Date expiredDate = Jwts.parserBuilder().setSigningKey(getKey(key)).build().parseClaimsJws(token).getBody().getExpiration(); //body에서 유효시간;
-        log.debug("JWT ==> {}", Jwts.parserBuilder().setSigningKey(getKey(key)).build().parseClaimsJws(token).getBody());
-        log.debug("JWT ==> {}", Jwts.parserBuilder().setSigningKey(getKey(key)).build().parseClaimsJws(token).getBody().get("loginId"));
-        log.debug("JWT ==> {}", Jwts.parserBuilder().setSigningKey(getKey(key)).build().parseClaimsJws(token).getBody().getExpiration());
+
         return expiredDate.before(new Date()); // 현재시간보다 더 전인가
     }
 

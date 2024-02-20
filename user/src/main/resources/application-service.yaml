@@ -5,7 +5,7 @@ spring:
 
 service:
   j-post-service: http://localhost:8081
-
+  j-authentication-service: http://localhost:8079
 
 ---
 spring:
@@ -15,4 +15,5 @@ spring:
 
 service:
   j-post-service: http://j-post-service:8080
+  j-authentication-service: http://j-authentication-service:8079
 
