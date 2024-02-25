@@ -1,6 +1,5 @@
-package com.authentication.common.configuration.util;
+package com.user.common.configuration.util;
 
-import com.common.entity.UserEntity;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -13,8 +12,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Map;
-import java.util.Objects;
 
 @Component
 @Slf4j
@@ -26,12 +23,9 @@ public class JwtUtil {
     /**
      * 토큰생성
      */
-    public String makeAuthToken(Map<String, Object> userClaims, int tokeTime) {
+    public String makeAuthToken(String loginId, int tokeTime) {
         Claims claims = Jwts.claims();
-
-        for (Map.Entry<String, Object> entrySet : userClaims.entrySet()) {
-            claims.put(entrySet.getKey(), entrySet.getValue());
-        }
+        claims.put("loginId", loginId);
 
         // 현재 날짜와 시간 가져오기
         Date currentDate = new Date();

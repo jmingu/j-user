@@ -1,7 +1,7 @@
 server:
   servlet:
     context-path: /api
-  port: 8080
+  port: 8081
 spring:
   profiles:
     active:
@@ -37,3 +37,9 @@ logging:
         orm:
           jdbc:
             bind: trace
+
+jwt:
+  secret-key: jmg_project_application_secret_key  #256bit 넘어야 한다
+  token:
+    expired-time: 60 #60분
+    expired-refresh-time: 10080 #7일

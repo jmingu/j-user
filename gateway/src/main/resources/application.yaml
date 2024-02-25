@@ -1,7 +1,12 @@
 server:
-  servlet:
-    context-path: /api
-  port: 8079
+  port: 8080
+
+eureka:
+  client:
+    fetch-registry: false
+    register-with-eureka: false
+    service-url:
+      defaultZone: http://localhost:8761/eureka
 spring:
   profiles:
     active:
@@ -12,34 +17,42 @@ spring:
         - local-oauth2
         - local-common
         - local-service
+        - local-gateway
       dev:
         - dev-db
         - dev-oauth2
         - dev-common
         - dev-service
+        - dev-gateway
       prod:
         - prod-db
         - prod-oauth2
         - prod-common
         - prod-service
+        - prod-gateway
     include:
       - db
       - oauth2
       - common
       - service
+      - gateway
+
+  main:
+    web-application-type: reactive
+
+logging:
+  level:
+    com.gateway: debug
+    org.springframework.cloud.gateway: TRACE
+    org.springframework.web: TRACE
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
 
 jwt:
   secret-key: jmg_project_application_secret_key  #256bit 넘어야 한다
   token:
     expired-time: 60 #60분
     expired-refresh-time: 10080 #7일
-
-logging:
-  level:
-    com:
-      authentication: debug
-    org:
-      hibernate:
-        orm:
-          jdbc:
-            bind: trace

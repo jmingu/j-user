@@ -3,12 +3,12 @@ package com.user.sns.service;
 import com.common.entity.OrganizationEntity;
 import com.common.entity.UserEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.user.common.configuration.util.JwtUtil;
 import com.user.common.feign.JwtTokenFeignClient;
 import com.user.common.feign.NidNaverFeignClient;
 import com.user.common.feign.OpenApiNaverFeignClient;
 import com.user.common.properties.Oauth2NaverRegistrationProperties;
 import com.user.sns.dto.JwtTokenUserDto;
-import com.user.sns.dto.JwtTokenUserResultDto;
 import com.user.sns.dto.OAuth2NaverLoginResultDto;
 import com.user.sns.dto.OAuth2NaverLoginTokenDto;
 import com.user.sns.dto.response.LoginTokenDto;
@@ -25,6 +25,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Transactional(readOnly = true)
 public class OAuth2LoginService {
+    private final JwtUtil jwtUtil;
+    @Value("${jwt.token.expired-time}")
+    private int expiredTime;
+
+    @Value("${jwt.token.expired-refresh-time}")
+    private int refreshTime;
 
     private final Oauth2NaverRegistrationProperties oauth2NaverRegistrationProperties;
     private final UserEntityRepository userEntityRepository;
@@ -84,12 +90,15 @@ public class OAuth2LoginService {
 
         JwtTokenUserDto jwtTokenUserDto = JwtTokenUserDto.builder()
                 .loginId(userEntity.getLoginId())
-                .userName(userEntity.getUserName())
                 .build();
 
-        ResponseEntity<JwtTokenUserResultDto> jwtToken = jwtTokenFeignClient.getJwtToken(jwtTokenUserDto);
+//        ResponseEntity<JwtTokenUserResultDto> jwtToken = jwtTokenFeignClient.getJwtToken(jwtTokenUserDto);
 
+        //        // 엑세스토큰발행(1시간)
+        String accessToken = jwtUtil.makeAuthToken(userEntity.getLoginId(), expiredTime);
+        // 리프레시 토큰발행(1달)
+        String refreshToken = jwtUtil.makeAuthToken(userEntity.getLoginId(), refreshTime);
 
-        return jwtToken.getBody().getResult();
+        return new LoginTokenDto(accessToken, refreshToken);
     }
 }

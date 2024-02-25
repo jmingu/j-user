@@ -1,16 +1,13 @@
 package com.user.common.configuration.filter;
-import com.common.dto.UserAuthenticationResultDto;
-import com.user.common.feign.AuthenticationFeignClient;
+
+import com.user.common.configuration.util.CryptoUtil;
+import com.user.common.configuration.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -26,42 +23,41 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtTokenFilter extends OncePerRequestFilter {
 
-    private final AuthenticationFeignClient authenticationFeignClient;
+    private final JwtUtil jwtUtil;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
+        // 로그인은 제외
+        if (request.getRequestURI().startsWith("/api/oauth/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-        // 헤더 정보
-        final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+        // 인증이 증명된 헤더
+        final String header = request.getHeader("X-Auth-Status");
+        final String key = header.split(" ")[0].trim(); // 암호화 랜덤키
+        final String value = header.split(" ")[1].trim(); // 암호화 된 정보
 
-        if (header == null || !header.startsWith("Bearer ")) { // 띄어쓰기 있음
+        if (header == null ) { // 띄어쓰기 있음
             log.error("Error header");
             filterChain.doFilter(request, response);
             return;
         }
 
         try {
-            ResponseEntity<UserAuthenticationResultDto> result = authenticationFeignClient.getResult(header);
-
-            // 성공 상태코드가 아닐 시
-            if(result.getStatusCode() != HttpStatus.OK){
-                log.error("HttpStaus error ==> {}", result);
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-            log.debug("result ==> {} " , result.getBody());
+            String decrypt = CryptoUtil.decrypt(value, key);
 
             // controller에서 사용자 정보 조회할 수 있음
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    result.getBody().getResult().getLoginId(), null, null
+                    decrypt, null, null
             );
 
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 //            // 여기에 context에 넣어 controller까지 넘겨 사용할 수 있음
             SecurityContextHolder.getContext().setAuthentication(authentication); // 여기까지 설정해야 시큐리티 정상으로 넘어간다.
 
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             log.error("Error token");
             filterChain.doFilter(request, response);
             return;

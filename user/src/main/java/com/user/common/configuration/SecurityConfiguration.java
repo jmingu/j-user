@@ -2,7 +2,6 @@ package com.user.common.configuration;
 
 
 import com.user.common.configuration.filter.JwtTokenFilter;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -23,6 +22,7 @@ public class SecurityConfiguration {
 
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
         http
                 .csrf((csrf) -> csrf.disable())
                 .cors(cors -> cors.disable())

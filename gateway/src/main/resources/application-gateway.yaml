@@ -1,0 +1,48 @@
+spring:
+  config:
+    activate:
+      on-profile: local-gateway
+
+  cloud:
+    gateway:
+      routes:
+        - id: user-server
+          uri: http://localhost:8081
+          predicates:
+            - Path=/user/**
+          filters:
+            - AuthorizationHeaderFilter
+            - RewritePath=/user/?(?<segment>.*), /$\{segment}
+        - id: post-server
+          uri: http://localhost:8082
+          predicates:
+            - Path=/post/**
+          filters:
+            - AuthorizationHeaderFilter
+            - RewritePath=/post/?(?<segment>.*), /$\{segment}
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod-gateway
+
+  cloud:
+    gateway:
+      routes:
+        - id: user-server
+          uri: http://localhost:8081
+          predicates:
+            - Path=/user/**
+          filters:
+            - Authentication
+            - RewritePath=/user/?(?<segment>.*), /$\{segment}
+        - id: post-server
+          uri: http://localhost:8082
+          predicates:
+            - Path=/post/**
+          filters:
+            - AuthorizationHeaderFilter
+            - RewritePath=/post/?(?<segment>.*), /$\{segment}
+

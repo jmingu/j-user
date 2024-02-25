@@ -1,12 +1,13 @@
 package com.common.dto;
 
-import com.common.enums.CodeEnum;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import com.common.enums.*;
 
 @Getter
 @Builder
