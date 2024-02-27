@@ -75,7 +75,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                 String encrypt = CryptoUtil.encrypt(userName, randomString);
 
                 // 검증 완료 헤더 추가
-                request.mutate().header("X-Auth-Status", randomString+ " " + encrypt)
+                request.mutate().header("X-Auth-Status", randomString + encrypt)
                         .build();
 
                 return chain.filter(exchange); // 토큰이 일치할 때

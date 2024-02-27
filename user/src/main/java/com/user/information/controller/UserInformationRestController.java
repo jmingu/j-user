@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -17,15 +17,40 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserInformationRestController {
     private final UserInformationService userInformationService;
 
-    @GetMapping("/user/{loginId}")
-    public ResponseEntity<CommonResponseDto> findUserId(@PathVariable String loginId) {
+    /**
+     * 회원정보 조회(login_id)
+     */
+    @GetMapping("/user/login")
+    public ResponseEntity<CommonResponseDto> findLoginId(@RequestParam String loginId) {
 
-        UserDto userDto = userInformationService.findUserId(loginId);
+        UserDto userDto = userInformationService.findLoginId(loginId);
 
         UserResponseDto responseDto = UserResponseDto.builder()
                 .userId(userDto.getUserId())
                 .loginId(userDto.getLoginId())
                 .userName(userDto.getUserName())
+                .nickname(userDto.getNickname())
+                .email(userDto.getEmail())
+                .gender(userDto.getGender())
+                .loginType(userDto.getLoginType())
+                .build();
+
+        return CommonResponseDto.success(responseDto);
+    }
+
+    /**
+     * 회원정보 조회(user_id)
+     */
+    @GetMapping("/user")
+    public ResponseEntity<CommonResponseDto> findUserId(@RequestParam Long userId) {
+
+        UserDto userDto = userInformationService.findUserId(userId);
+
+        UserResponseDto responseDto = UserResponseDto.builder()
+                .userId(userDto.getUserId())
+                .loginId(userDto.getLoginId())
+                .userName(userDto.getUserName())
+                .nickname(userDto.getNickname())
                 .email(userDto.getEmail())
                 .gender(userDto.getGender())
                 .loginType(userDto.getLoginType())

@@ -24,6 +24,8 @@ public class UserEntity extends BaseEntity {
 
     private String loginType;
 
+    private String nickname;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organization_id")
     private OrganizationEntity organizationEntity;
