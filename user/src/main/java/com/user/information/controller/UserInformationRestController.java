@@ -32,7 +32,7 @@ public class UserInformationRestController {
                 .nickname(userDto.getNickname())
                 .email(userDto.getEmail())
                 .gender(userDto.getGender())
-                .loginType(userDto.getLoginType())
+                .loginTypeId(userDto.getLoginTypeId())
                 .build();
 
         return CommonResponseDto.success(responseDto);
@@ -53,7 +53,7 @@ public class UserInformationRestController {
                 .nickname(userDto.getNickname())
                 .email(userDto.getEmail())
                 .gender(userDto.getGender())
-                .loginType(userDto.getLoginType())
+                .loginTypeId(userDto.getLoginTypeId())
                 .build();
 
         return CommonResponseDto.success(responseDto);

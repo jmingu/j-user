@@ -16,7 +16,7 @@ public class UserResponseDto {
 
     private String gender;
 
-    private String loginType;
+    private Long loginTypeId;
 
     private String nickname;
 }

@@ -32,7 +32,7 @@ public class UserInformationService {
                 .nickname(userEntity.getNickname())
                 .email(userEntity.getEmail())
                 .gender(userEntity.getGender())
-                .loginType(userEntity.getLoginType())
+                .loginTypeId(userEntity.getLoginTypeEntity().getLoginTypeId())
                 .build();
 
         return userDto;
@@ -52,7 +52,7 @@ public class UserInformationService {
                 .nickname(userEntity.getNickname())
                 .email(userEntity.getEmail())
                 .gender(userEntity.getGender())
-                .loginType(userEntity.getLoginType())
+                .loginTypeId(userEntity.getLoginTypeEntity().getLoginTypeId())
                 .build();
 
         return userDto;
@@ -75,7 +75,7 @@ public class UserInformationService {
                     .nickname(userEntity.getNickname())
                     .email(userEntity.getEmail())
                     .gender(userEntity.getGender())
-                    .loginType(userEntity.getLoginType())
+                    .loginTypeId(userEntity.getLoginTypeEntity().getLoginTypeId())
                     .build();
             userDtos.add(userDto);
         }

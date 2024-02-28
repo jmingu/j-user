@@ -13,25 +13,21 @@ spring:
       - local
     group:
       local:
-        - local-db
         - local-common
         - local-service
         - local-gateway
         - local-authorization
       dev:
-        - dev-db
         - dev-common
         - dev-service
         - dev-gateway
         - dev-authorization
       prod:
-        - prod-db
         - prod-common
         - prod-service
         - prod-gateway
         - prod-authorization
     include:
-      - db
       - common
       - service
       - gateway
@@ -45,9 +41,5 @@ logging:
     com.gateway: debug
     org.springframework.cloud.gateway: TRACE
     org.springframework.web: TRACE
-management:
-  endpoints:
-    web:
-      exposure:
-        include: '*'
+
 

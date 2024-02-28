@@ -26,6 +26,10 @@ public class OrganizationEntity extends BaseEntity {
 
     private LocalDateTime organizationEndDate;
 
+    private long parentOrganizationId;
+
+    private int organizationLevel;
+
     @OneToMany(mappedBy = "organizationEntity")
     private List<UserEntity> userEntity;
 }

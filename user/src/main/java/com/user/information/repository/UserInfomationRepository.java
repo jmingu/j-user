@@ -13,11 +13,13 @@ public interface UserInfomationRepository extends JpaRepository<UserEntity, Long
     /**
      * 회원정보 조회(login_id)
      */
+    @Query("select user from UserEntity user inner join fetch user.loginTypeEntity where user.loginId = :loginId")
     UserEntity findByLoginId(String loginId);
 
     /**
      * 회원정보 조회(user_id)
      */
+    @Query("select user from UserEntity user inner join fetch user.loginTypeEntity where user.userId = :userId")
     UserEntity findByUserId(Long userId);
 
     /**

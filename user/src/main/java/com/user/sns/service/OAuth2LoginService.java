@@ -1,17 +1,16 @@
 package com.user.sns.service;
 
-import com.common.entity.OrganizationEntity;
-import com.common.entity.UserEntity;
+import com.common.entity.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.user.common.configuration.util.JwtUtil;
-import com.user.common.feign.JwtTokenFeignClient;
 import com.user.common.feign.NidNaverFeignClient;
 import com.user.common.feign.OpenApiNaverFeignClient;
 import com.user.common.properties.Oauth2NaverRegistrationProperties;
-import com.user.sns.dto.JwtTokenUserDto;
 import com.user.sns.dto.OAuth2NaverLoginResultDto;
 import com.user.sns.dto.OAuth2NaverLoginTokenDto;
 import com.user.sns.dto.response.LoginTokenDto;
+import com.user.sns.repository.LoginHistoryDetailEntityRepository;
+import com.user.sns.repository.LoginHistoryEntityRepository;
 import com.user.sns.repository.UserEntityRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +18,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -34,11 +35,13 @@ public class OAuth2LoginService {
 
     private final Oauth2NaverRegistrationProperties oauth2NaverRegistrationProperties;
     private final UserEntityRepository userEntityRepository;
+    private final LoginHistoryEntityRepository loginHistoryEntityRepository;
+
+    private final LoginHistoryDetailEntityRepository loginHistoryDetailEntityRepository;
 
     private final NidNaverFeignClient nidNaverFeignClient;
     private final OpenApiNaverFeignClient openApiNaverFeignClient;
 
-    private final JwtTokenFeignClient jwtTokenFeignClient;
     @Transactional
     public LoginTokenDto getToken(String code, String state) throws Exception {
 
@@ -63,13 +66,14 @@ public class OAuth2LoginService {
 
         // 아이디 조회 후 없을 시 회원가입
         long loginIdCnt = userEntityRepository.countByLoginId(oAuth2NaverLoginResultDto.getResponse().getId());
-
-        log.debug("loginIdCnt ==> {}", loginIdCnt);
         if (loginIdCnt == 0) {
             log.debug("loginId is null");
+            LoginTypeEntity naver = userEntityRepository.findLoginType("NAVER");
+
             OrganizationEntity organizationEntity = OrganizationEntity.builder()
                     .organizationId(1)
                     .organizationName("기본")
+                    .organizationLevel(0)
                     .build();
 
             UserEntity userEntity = new UserEntity(
@@ -78,25 +82,40 @@ public class OAuth2LoginService {
                     oAuth2NaverLoginResultDto.getResponse().getEmail(),
                     oAuth2NaverLoginResultDto.getResponse().getEmail(),
                     oAuth2NaverLoginResultDto.getResponse().getGender(),
-                    "NAVER",
-                    organizationEntity
+                    organizationEntity,
+                    naver
             );
 
             // 회원가입
             userEntityRepository.save(userEntity);
         }
 
-        UserEntity userEntity = userEntityRepository.findByLoginId(oAuth2NaverLoginResultDto.getResponse().getId()).get();
+        // 사용자 정보 받아오기
+        UserEntity userEntity = userEntityRepository.findByLoginId(oAuth2NaverLoginResultDto.getResponse().getId());
 
-        JwtTokenUserDto jwtTokenUserDto = JwtTokenUserDto.builder()
-                .loginId(userEntity.getLoginId())
-                .build();
+        // 로그인 이력 등록
+        LoginHistoryEntity history = loginHistoryEntityRepository.findLoginHistory(userEntity.getUserId(),LocalDate.now());
 
-//        ResponseEntity<JwtTokenUserResultDto> jwtToken = jwtTokenFeignClient.getJwtToken(jwtTokenUserDto);
+        log.debug("history ==> {}", history);
 
-        //        // 엑세스토큰발행(1시간)
+        // 금일 로그인 기록이 없다면 로그인 등록, 로그인 상세 등록
+        if (history == null) {
+            LoginHistoryEntity loginHistory = new LoginHistoryEntity(userEntity);
+            LoginHistoryEntity loginHistoryEntity = loginHistoryEntityRepository.save(loginHistory);
+
+            LoginHistoryDetailEntity newLoginHistoryDetail = new LoginHistoryDetailEntity(loginHistoryEntity, userEntity.getUserId());
+            // 로그인 상세 이력 등록
+            loginHistoryDetailEntityRepository.save(newLoginHistoryDetail);
+        }
+
+        // 금일 로그인 기록이 있다면 로그인 상세만 등록
+        LoginHistoryDetailEntity loginHistoryDetail = new LoginHistoryDetailEntity(history, userEntity.getUserId());
+        // 로그인 상세 이력 등록
+        loginHistoryDetailEntityRepository.save(loginHistoryDetail);
+
+        // 엑세스토큰발행
         String accessToken = jwtUtil.makeAuthToken(userEntity.getLoginId(), expiredTime);
-        // 리프레시 토큰발행(1달)
+        // 리프레시 토큰발행
         String refreshToken = jwtUtil.makeAuthToken(userEntity.getLoginId(), refreshTime);
 
         return new LoginTokenDto(accessToken, refreshToken);
