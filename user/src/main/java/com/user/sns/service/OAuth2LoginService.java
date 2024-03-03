@@ -107,11 +107,12 @@ public class OAuth2LoginService {
             // 로그인 상세 이력 등록
             loginHistoryDetailEntityRepository.save(newLoginHistoryDetail);
         }
-
         // 금일 로그인 기록이 있다면 로그인 상세만 등록
-        LoginHistoryDetailEntity loginHistoryDetail = new LoginHistoryDetailEntity(history, userEntity.getUserId());
-        // 로그인 상세 이력 등록
-        loginHistoryDetailEntityRepository.save(loginHistoryDetail);
+        else {
+            LoginHistoryDetailEntity loginHistoryDetail = new LoginHistoryDetailEntity(history, userEntity.getUserId());
+            // 로그인 상세 이력 등록
+            loginHistoryDetailEntityRepository.save(loginHistoryDetail);
+        }
 
         // 엑세스토큰발행
         String accessToken = jwtUtil.makeAuthToken(userEntity.getLoginId(), expiredTime);

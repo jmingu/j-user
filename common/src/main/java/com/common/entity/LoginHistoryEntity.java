@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -21,9 +20,6 @@ public class LoginHistoryEntity extends BaseEntity {
     @JoinColumn(name = "user_id")
     private UserEntity userEntity;
     private LocalDate loginYmd;
-
-    @OneToMany(mappedBy = "loginHistoryEntity")
-    private List<LoginHistoryDetailEntity> loginHistoryDetailEntity;
 
     public LoginHistoryEntity(UserEntity userEntity) {
         this.userEntity = userEntity;
