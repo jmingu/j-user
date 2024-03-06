@@ -40,6 +40,7 @@ logging:
 
 jwt:
   secret-key: jmg_project_application_secret_key  #256bit 넘어야 한다
+  token-decrypt-key: j-project_tokenk
   token:
     expired-time: 60 #60분
     expired-refresh-time: 10080 #7일

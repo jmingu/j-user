@@ -27,6 +27,9 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
     @Value("${jwt.secret-key}")
     private String secretKey;
 
+    @Value("${jwt.token-decrypt-key}")
+    private String tokenDecryptKey;
+
     public AuthorizationHeaderFilter(JwtUtil jwtUtil) {
         super(Config.class);
         this.jwtUtil = jwtUtil;
@@ -44,7 +47,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             try{
                 log.debug("request ==> {}", request.getPath());
                 // 요청 경로가 /user/api/oauth/naver를 포함하는 경우(로그인) 통과
-                if (request.getPath().toString().startsWith("/user/api/oauth/naver")) {
+                if (request.getPath().toString().startsWith("/user/api/oauth/login")) {
                     return chain.filter(exchange);
                 }
 
@@ -58,15 +61,18 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
 
                 final String header = request.getHeaders().get("authorization").get(0);
                 // 토큰 가져오기 (Bearer를 뺸다)
-                final String token = header.split(" ")[1].trim();
+                String getToken = header.split(" ")[1].trim();
+
+                // 복호화 헤저
+                final String decryptToken = CryptoUtil.decrypt(getToken, tokenDecryptKey);
 
                 // 토큰유효 확인
-                if (jwtUtil.isExpired(token, secretKey)) {
+                if (jwtUtil.isExpired(decryptToken, secretKey)) {
                     return errorResponse(exchange, HttpStatus.UNAUTHORIZED, "Token is invalid");
                 }
 
                 // 토큰의 사용자 아이디 가져오기
-                String userName = jwtUtil.getUserName(token, secretKey);
+                String userName = jwtUtil.getUserName(decryptToken, secretKey);
 
                 // 랜덤으로 16자리 암호화 키 만들기
                 String randomString = UUID.randomUUID().toString().replace("-", "").substring(0, 16);

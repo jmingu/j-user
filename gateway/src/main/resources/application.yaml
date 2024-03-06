@@ -32,14 +32,28 @@ spring:
       - service
       - gateway
       - authorization
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
 
   main:
     web-application-type: reactive
+
+
 
 logging:
   level:
     com.gateway: debug
     org.springframework.cloud.gateway: TRACE
     org.springframework.web: TRACE
+
 
 

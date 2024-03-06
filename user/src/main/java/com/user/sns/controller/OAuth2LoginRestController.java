@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class OAuth2LoginRestController {
     private final OAuth2LoginService oAuth2LoginService;
 
-    @GetMapping("/oauth/naver/callback")
+    @GetMapping("/oauth/login/naver")
     public ResponseEntity<CommonResponseDto> NaverLogin(@RequestParam("code") String code, @RequestParam("state") String state) throws Exception {
 
         if (code == null || state == null) {

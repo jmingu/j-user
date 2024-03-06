@@ -2,6 +2,7 @@ package com.user.sns.service;
 
 import com.common.entity.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.user.common.configuration.util.CryptoUtil;
 import com.user.common.configuration.util.JwtUtil;
 import com.user.common.feign.NidNaverFeignClient;
 import com.user.common.feign.OpenApiNaverFeignClient;
@@ -32,6 +33,9 @@ public class OAuth2LoginService {
 
     @Value("${jwt.token.expired-refresh-time}")
     private int refreshTime;
+
+    @Value("${jwt.token-decrypt-key}")
+    private String tokenDecryptKey;
 
     private final Oauth2NaverRegistrationProperties oauth2NaverRegistrationProperties;
     private final UserEntityRepository userEntityRepository;
@@ -115,9 +119,9 @@ public class OAuth2LoginService {
         }
 
         // 엑세스토큰발행
-        String accessToken = jwtUtil.makeAuthToken(userEntity.getLoginId(), expiredTime);
+        String accessToken = CryptoUtil.encrypt(jwtUtil.makeAuthToken(userEntity.getLoginId(), expiredTime), tokenDecryptKey);
         // 리프레시 토큰발행
-        String refreshToken = jwtUtil.makeAuthToken(userEntity.getLoginId(), refreshTime);
+        String refreshToken = CryptoUtil.encrypt(jwtUtil.makeAuthToken(userEntity.getLoginId(), refreshTime), tokenDecryptKey);
 
         return new LoginTokenDto(accessToken, refreshToken);
     }
