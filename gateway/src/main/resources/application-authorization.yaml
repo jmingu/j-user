@@ -5,7 +5,7 @@ spring:
 
 jwt:
   secret-key: jmg_project_application_secret_key  #256bit 넘어야 한다
-  token-decrypt-key: j-project_tokenk
+  token-decrypt-key: j-project--token
   token:
     expired-time: 180 # 180분
     expired-refresh-time: 10080 # 7일
@@ -19,7 +19,7 @@ spring:
 
 jwt:
   secret-key: jmg_project_application_secret_key  #256bit 넘어야 한다
-  token-decrypt-key: j-project_tokenk
+  token-decrypt-key: j-project--token
   token:
     expired-time: 60 # 60분
     expired-refresh-time: 10080 # 7일

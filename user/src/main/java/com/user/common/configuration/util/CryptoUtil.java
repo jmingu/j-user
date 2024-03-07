@@ -16,7 +16,7 @@ public class CryptoUtil {
         return Base64.getEncoder().encodeToString(encrypted);
     }
 
-    // 복호화
+
     // 복호화
     public static String decrypt(String header) throws Exception {
 
