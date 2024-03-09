@@ -1,12 +1,13 @@
 package com.gateway.common.configuration.util;
 
+import com.common.property.JwtProperty;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
@@ -17,10 +18,9 @@ import java.util.Map;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class JwtUtil {
-
-    @Value("${jwt.secret-key}")
-    private String secretKey;
+    private final JwtProperty jwtProperty;
 
     /**
      * 토큰생성
@@ -47,7 +47,7 @@ public class JwtUtil {
                 .setClaims(claims)
                 .setIssuedAt(currentDate) // 발생시간
                 .setExpiration(newDate) // 만료시간
-                .signWith(getKey(secretKey), SignatureAlgorithm.HS256)
+                .signWith(getKey(jwtProperty.getSecretKey()), SignatureAlgorithm.HS256)
                 .compact(); // String으로 만듬 base64로 인코딩;
     }
 

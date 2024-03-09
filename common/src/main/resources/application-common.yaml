@@ -5,6 +5,11 @@ spring:
 server:
   shutdown: immediate
 
+jwt:
+  secret-key: jmg_project_application_secret_key  #256bit 넘어야 한다
+  token-decrypt-key: j-project--token
+  expired-time: 60 #60분
+  expired-refresh-time: 10080 #7일
 ---
 
 spring:
@@ -14,6 +19,12 @@ spring:
 server:
   shutdown: immediate
 
+jwt:
+  secret-key: jmg_project_application_secret_key  #256bit 넘어야 한다
+  token-decrypt-key: j-project--token
+  expired-time: 60 #60분
+  expired-refresh-time: 10080 #7일
+
 ---
 
 spring:
@@ -22,3 +33,9 @@ spring:
       on-profile: prod-common
 server:
   shutdown: graceful
+
+jwt:
+  secret-key: jmg_project_application_secret_key  #256bit 넘어야 한다
+  token-decrypt-key: j-project--token
+  expired-time: 60 #60분
+  expired-refresh-time: 10080 #7일

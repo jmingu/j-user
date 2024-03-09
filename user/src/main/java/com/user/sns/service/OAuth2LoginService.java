@@ -1,6 +1,7 @@
 package com.user.sns.service;
 
 import com.common.entity.*;
+import com.common.property.JwtProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.user.common.configuration.util.CryptoUtil;
 import com.user.common.configuration.util.JwtUtil;
@@ -15,7 +16,6 @@ import com.user.sns.repository.LoginHistoryEntityRepository;
 import com.user.sns.repository.UserEntityRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,14 +28,8 @@ import java.time.LocalDate;
 @Transactional(readOnly = true)
 public class OAuth2LoginService {
     private final JwtUtil jwtUtil;
-    @Value("${jwt.token.expired-time}")
-    private int expiredTime;
 
-    @Value("${jwt.token.expired-refresh-time}")
-    private int refreshTime;
-
-    @Value("${jwt.token-decrypt-key}")
-    private String tokenDecryptKey;
+    private final JwtProperty jwtProperty;
 
     private final Oauth2NaverRegistrationProperties oauth2NaverRegistrationProperties;
     private final UserEntityRepository userEntityRepository;
@@ -119,9 +113,9 @@ public class OAuth2LoginService {
         }
 
         // 엑세스토큰발행
-        String accessToken = CryptoUtil.encrypt(jwtUtil.makeAuthToken(userEntity.getLoginId(), expiredTime), tokenDecryptKey);
+        String accessToken = CryptoUtil.encrypt(jwtUtil.makeAuthToken(userEntity.getLoginId(), jwtProperty.getExpiredTime()), jwtProperty.getTokenDecryptKey());
         // 리프레시 토큰발행
-        String refreshToken = CryptoUtil.encrypt(jwtUtil.makeAuthToken(userEntity.getLoginId(), refreshTime), tokenDecryptKey);
+        String refreshToken = CryptoUtil.encrypt(jwtUtil.makeAuthToken(userEntity.getLoginId(), jwtProperty.getExpiredRefreshTime()), jwtProperty.getTokenDecryptKey());
 
         return new LoginTokenDto(accessToken, refreshToken);
     }

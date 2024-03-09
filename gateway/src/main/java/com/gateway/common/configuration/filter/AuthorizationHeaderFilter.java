@@ -1,10 +1,10 @@
 package com.gateway.common.configuration.filter;
 
 
+import com.common.property.JwtProperty;
 import com.gateway.common.configuration.util.CryptoUtil;
 import com.gateway.common.configuration.util.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -24,16 +24,15 @@ import java.util.UUID;
 public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<AuthorizationHeaderFilter.Config> {
 
     private JwtUtil jwtUtil;
-    @Value("${jwt.secret-key}")
-    private String secretKey;
+    private JwtProperty jwtProperty;
 
-    @Value("${jwt.token-decrypt-key}")
-    private String tokenDecryptKey;
 
-    public AuthorizationHeaderFilter(JwtUtil jwtUtil) {
+    public AuthorizationHeaderFilter(JwtUtil jwtUtil, JwtProperty jwtProperty) {
         super(Config.class);
         this.jwtUtil = jwtUtil;
+        this.jwtProperty = jwtProperty;
     }
+
     public static class Config {
         // application.yml 파일에서 지정한 filer의 Argument값을 받는 부분
     }
@@ -64,15 +63,15 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                 String getToken = header.split(" ")[1].trim();
 
                 // 복호화 헤저
-                final String decryptToken = CryptoUtil.decrypt(getToken, tokenDecryptKey);
+                final String decryptToken = CryptoUtil.decrypt(getToken, jwtProperty.getTokenDecryptKey());
 
                 // 토큰유효 확인
-                if (jwtUtil.isExpired(decryptToken, secretKey)) {
+                if (jwtUtil.isExpired(decryptToken, jwtProperty.getSecretKey())) {
                     return errorResponse(exchange, HttpStatus.UNAUTHORIZED, "Token is invalid");
                 }
 
                 // 토큰의 사용자 아이디 가져오기
-                String userName = jwtUtil.getUserName(decryptToken, secretKey);
+                String userName = jwtUtil.getUserName(decryptToken, jwtProperty.getSecretKey());
 
                 // 랜덤으로 16자리 암호화 키 만들기
                 String randomString = UUID.randomUUID().toString().replace("-", "").substring(0, 16);
