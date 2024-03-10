@@ -27,8 +27,10 @@ public class UserInformationRestController {
         // 헤더 정보
         final String header = request.getHeader("X-Auth-Status");
 
-        String loginId = CryptoUtil.decrypt(header);
-        UserDto userDto = userInformationService.findLoginId(loginId);
+        // 헤더에 user_id 존재
+        long userId = Long.parseLong(CryptoUtil.decrypt(header));
+
+        UserDto userDto = userInformationService.findUserId(userId);
 
         UserResponseDto responseDto = UserResponseDto.builder()
                 .userName(userDto.getUserName())

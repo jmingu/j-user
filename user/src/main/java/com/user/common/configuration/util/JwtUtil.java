@@ -1,5 +1,6 @@
 package com.user.common.configuration.util;
 
+import com.common.entity.UserEntity;
 import com.common.property.JwtProperty;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -23,9 +24,9 @@ public class JwtUtil {
     /**
      * 토큰생성
      */
-    public String makeAuthToken(String loginId, int tokeTime) {
+    public String makeAuthToken(UserEntity userEntity, int tokeTime) {
         Claims claims = Jwts.claims();
-        claims.put("loginId", loginId);
+        claims.put("userId", userEntity.getUserId()+"");
 
         // 현재 날짜와 시간 가져오기
         Date currentDate = new Date();

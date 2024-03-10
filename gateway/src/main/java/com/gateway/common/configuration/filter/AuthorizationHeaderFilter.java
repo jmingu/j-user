@@ -17,15 +17,22 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 @Component
 @Slf4j
 public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<AuthorizationHeaderFilter.Config> {
 
+    // 필터 없이 되야하는 추가 경로를 추가할 수 있습니다.
+    private static final List<String> ALLOWED_PATHS = Arrays.asList(
+            "/post/api/borads",
+            "/post/api/comments"
+    );
+
     private JwtUtil jwtUtil;
     private JwtProperty jwtProperty;
-
 
     public AuthorizationHeaderFilter(JwtUtil jwtUtil, JwtProperty jwtProperty) {
         super(Config.class);
@@ -41,28 +48,40 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
     public GatewayFilter apply(Config config) {
 
         return ((exchange, chain) -> {
-            ServerHttpRequest request = exchange.getRequest();
 
             try{
-                log.debug("request ==> {}", request.getPath());
-                // 요청 경로가 /user/api/oauth/naver를 포함하는 경우(로그인) 통과
-                if (request.getPath().toString().startsWith("/user/api/oauth/login")) {
+                ServerHttpRequest request = exchange.getRequest();
+
+                // 로그인이면 그냥 통과
+                if (request.getPath().toString().startsWith("/user/api/oauth/")) {
                     return chain.filter(exchange);
+                }
+
+                final String header = request.getHeaders().get("authorization").get(0);
+
+                // 토큰 가져오기 (Bearer를 뺸다)
+                String getToken = header.split(" ")[1].trim();
+
+                // 필터링 로직(로그인 없이 봐도 되는 페이지)
+                if (isAllowedRequest(request)) {
+                    // 로그인을 안했다면 로그인 아이디 임시로 음수로 주기위해 추가
+                    if (getToken == null || getToken.equals("undefined") || getToken.equals("null")) {
+                        // 검증헤더 추가
+                        AddHeader(request, null);
+                        return chain.filter(exchange);
+                    }
                 }
 
                 // 헤더 정보
                 log.debug("header ==> {}", request.getHeaders());
                 // 토큰있는 헤더시작은 Bearer 로 시작한다.
+
                 if(request.getHeaders() == null || !request.getHeaders().containsKey("authorization")){
                     log.error("Error header");
                     return errorResponse(exchange, HttpStatus.UNAUTHORIZED, null);
                 }
 
-                final String header = request.getHeaders().get("authorization").get(0);
-                // 토큰 가져오기 (Bearer를 뺸다)
-                String getToken = header.split(" ")[1].trim();
-
-                // 복호화 헤저
+                // 복호화 해저
                 final String decryptToken = CryptoUtil.decrypt(getToken, jwtProperty.getTokenDecryptKey());
 
                 // 토큰유효 확인
@@ -71,20 +90,14 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                 }
 
                 // 토큰의 사용자 아이디 가져오기
-                String userName = jwtUtil.getUserName(decryptToken, jwtProperty.getSecretKey());
+                String userId = jwtUtil.getUserName(decryptToken, jwtProperty.getSecretKey());
 
-                // 랜덤으로 16자리 암호화 키 만들기
-                String randomString = UUID.randomUUID().toString().replace("-", "").substring(0, 16);
-
-                // 암호화
-                String encrypt = CryptoUtil.encrypt(userName, randomString);
-
-                // 검증 완료 헤더 추가
-                request.mutate().header("X-Auth-Status", randomString + encrypt)
-                        .build();
+                // 검증헤더 추가
+                AddHeader(request, userId);
 
                 return chain.filter(exchange); // 토큰이 일치할 때
             } catch (Exception e){
+                e.printStackTrace();
                 return errorResponse(exchange, HttpStatus.UNAUTHORIZED, e.getMessage());
             }
         });
@@ -105,6 +118,29 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
         String responseBody = String.format("{\"resultCode\": %d, \"resultMessage\": \"%s\"}", status.value(), message);
         DataBuffer buffer = response.bufferFactory().wrap(responseBody.getBytes(StandardCharsets.UTF_8));
         return response.writeWith(Mono.just(buffer)); // 응답 본문을 설정하고 Mono<Void> 반환
+    }
+
+    // 통과로직
+    private boolean isAllowedRequest(ServerHttpRequest request) {
+        return ALLOWED_PATHS.stream()
+                .anyMatch(path -> request.getPath().toString().startsWith(path));
+    }
+
+    // 헤더만들기
+    private void AddHeader(ServerHttpRequest request, String userId) throws Exception {
+        // 랜덤으로 16자리 암호화 키 만들기
+        String randomString = UUID.randomUUID().toString().replace("-", "").substring(0, 16);
+
+        if (userId == null) {
+            userId = -1+"";
+        }
+
+        // 암호화
+        String encrypt = CryptoUtil.encrypt(userId, randomString);
+
+        // 검증 완료 헤더 추가
+        request.mutate().header("X-Auth-Status", randomString + encrypt)
+                .build();
     }
 
 }

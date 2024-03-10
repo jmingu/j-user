@@ -83,7 +83,7 @@ public class JwtUtil {
 
     // 토큰에서 정보 가져오기
     public String getUserName(String token, String key) {
-        return extractClaims(token, key).get("loginId", String.class); //body에서 loginId가져오기
+        return extractClaims(token, key).get("userId", String.class); //body에서 userId가져오기
     }
 
 

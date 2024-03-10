@@ -113,9 +113,9 @@ public class OAuth2LoginService {
         }
 
         // 엑세스토큰발행
-        String accessToken = CryptoUtil.encrypt(jwtUtil.makeAuthToken(userEntity.getLoginId(), jwtProperty.getExpiredTime()), jwtProperty.getTokenDecryptKey());
+        String accessToken = CryptoUtil.encrypt(jwtUtil.makeAuthToken(userEntity, jwtProperty.getExpiredTime()), jwtProperty.getTokenDecryptKey());
         // 리프레시 토큰발행
-        String refreshToken = CryptoUtil.encrypt(jwtUtil.makeAuthToken(userEntity.getLoginId(), jwtProperty.getExpiredRefreshTime()), jwtProperty.getTokenDecryptKey());
+        String refreshToken = CryptoUtil.encrypt(jwtUtil.makeAuthToken(userEntity, jwtProperty.getExpiredRefreshTime()), jwtProperty.getTokenDecryptKey());
 
         return new LoginTokenDto(accessToken, refreshToken);
     }
