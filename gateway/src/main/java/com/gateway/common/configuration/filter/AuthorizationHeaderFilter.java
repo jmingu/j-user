@@ -28,7 +28,9 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
     // 필터 없이 되야하는 추가 경로를 추가할 수 있습니다.
     private static final List<String> ALLOWED_PATHS = Arrays.asList(
             "/post/api/borads",
-            "/post/api/comments"
+            "/post/api/comments",
+            "/user/api/user/join",
+            "/user/api/user/login"// 로그인 아이디 체크
     );
 
     private JwtUtil jwtUtil;
@@ -81,7 +83,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                     return errorResponse(exchange, HttpStatus.UNAUTHORIZED, null);
                 }
 
-                // 복호화 해저
+                // 복호화 해제
                 final String decryptToken = CryptoUtil.decrypt(getToken, jwtProperty.getTokenDecryptKey());
 
                 // 토큰유효 확인

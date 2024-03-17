@@ -77,7 +77,7 @@ public class OAuth2LoginService {
             UserEntity userEntity = new UserEntity(
                     oAuth2NaverLoginResultDto.getResponse().getId(),
                     oAuth2NaverLoginResultDto.getResponse().getName(),
-                    oAuth2NaverLoginResultDto.getResponse().getEmail(),
+                    null,
                     oAuth2NaverLoginResultDto.getResponse().getEmail(),
                     oAuth2NaverLoginResultDto.getResponse().getGender(),
                     organizationEntity,

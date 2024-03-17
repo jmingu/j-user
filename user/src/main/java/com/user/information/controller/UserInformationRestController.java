@@ -3,15 +3,21 @@ package com.user.information.controller;
 import com.common.dto.CommonResponseDto;
 import com.user.common.configuration.util.CryptoUtil;
 import com.user.information.dto.UserDto;
+import com.user.information.dto.UserJoinDto;
+import com.user.information.dto.request.UserCreateNickNameRequestDto;
+import com.user.information.dto.request.UserCreateRequestDto;
+import com.user.information.dto.request.UserLoginRequestDto;
 import com.user.information.dto.response.UserResponseDto;
 import com.user.information.service.UserInformationService;
+import com.user.sns.dto.response.LoginTokenDto;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -83,4 +89,74 @@ public class UserInformationRestController {
 
         return CommonResponseDto.success(responseDto);
     }
+
+    /**
+     * 닉네임 등록
+     */
+    @PostMapping("/user/nickname")
+    public ResponseEntity<CommonResponseDto> createNickname(@RequestBody UserCreateNickNameRequestDto userCreateNickNameRequestDto, HttpServletRequest request) throws Exception {
+
+        // 헤더 정보
+        final String header = request.getHeader("X-Auth-Status");
+        long userId = Long.parseLong(CryptoUtil.decrypt(header));
+
+        userInformationService.createNickname(userCreateNickNameRequestDto.getNickname(), header);
+
+        UserDto userDto = userInformationService.findUserId(userId);
+        log.debug("userDto ====> {}", userDto);
+        UserResponseDto responseDto = UserResponseDto.builder()
+                .userName(userDto.getUserName())
+                .nickname(userDto.getNickname())
+                .email(userDto.getEmail())
+                .gender(userDto.getGender())
+                .build();
+
+        return CommonResponseDto.success(responseDto);
+    }
+
+    /**
+     * 로그인 아이디 중복검사
+     */
+    @GetMapping("/user/join/login-check")
+    public ResponseEntity<CommonResponseDto> findLoginIdCheck(@RequestParam String loginId) {
+
+        userInformationService.findLoginIdCheck(loginId);
+
+        Map result = new HashMap<>();
+
+        result.put("loginId", loginId);
+
+        return CommonResponseDto.success(result);
+    }
+
+    /**
+     * 회원가입
+     */
+    @PostMapping("/user/join")
+    public ResponseEntity<CommonResponseDto> saveUser(@RequestBody UserCreateRequestDto userCreateRequestDto){
+
+        UserJoinDto userJoinDto = UserJoinDto.builder()
+                .loginId(userCreateRequestDto.getLoginId())
+                .userName(userCreateRequestDto.getUserName())
+                .gender(userCreateRequestDto.getGender())
+                .email(userCreateRequestDto.getEmail())
+                .password(userCreateRequestDto.getPassword())
+                .build();
+
+        userInformationService.saveUser(userJoinDto);
+
+        return CommonResponseDto.success(userJoinDto);
+    }
+
+    /**
+     * 일반 로그인
+     */
+    @PostMapping("/user/login")
+    public ResponseEntity<CommonResponseDto> userLogin(@RequestBody UserLoginRequestDto userLoginRequestDto) throws Exception {
+
+        LoginTokenDto loginTokenDto = userInformationService.userLogin(userLoginRequestDto.getLoginId(), userLoginRequestDto.getPassword());
+
+        return CommonResponseDto.success(loginTokenDto);
+    }
+
 }
