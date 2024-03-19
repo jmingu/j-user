@@ -64,14 +64,19 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                 // 토큰 가져오기 (Bearer를 뺸다)
                 String getToken = header.split(" ")[1].trim();
 
-                // 필터링 로직(로그인 없이 봐도 되는 페이지)
+                // 필터링 로직(로그인 없이 봐도 되는 페이지) 
                 if (isAllowedRequest(request)) {
-                    // 로그인을 안했다면 로그인 아이디 임시로 음수로 주기위해 추가
+                    AddHeader(request, null);
                     if (getToken == null || getToken.equals("undefined") || getToken.equals("null")) {
-                        // 검증헤더 추가
-                        AddHeader(request, null);
                         return chain.filter(exchange);
                     }
+
+//                    // 로그인을 안했다면 로그인 아이디 임시로 음수로 주기위해 추가
+//                    if (getToken == null || getToken.equals("undefined") || getToken.equals("null")) {
+//                        // 검증헤더 추가
+//                        AddHeader(request, null);
+//                        return chain.filter(exchange);
+//                    }
                 }
 
                 // 헤더 정보
