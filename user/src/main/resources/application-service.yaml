@@ -4,8 +4,7 @@ spring:
       on-profile: local-service
 
 service:
-  j-post-service: http://localhost:8081
-  j-authentication-service: http://localhost:8079
+  j-post-service: http://localhost:8082
 
 ---
 spring:
@@ -14,6 +13,5 @@ spring:
       on-profile: prod-service
 
 service:
-  j-post-service: http://j-post-service:8080
-  j-authentication-service: http://j-authentication-service:8079
+  j-post-service: http://144.24.80.74:8082
 

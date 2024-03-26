@@ -3,6 +3,13 @@ spring:
     activate:
       on-profile: local-gateway
 
+eureka:
+  client:
+    fetch-registry: false
+    register-with-eureka: false
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
   cloud:
     gateway:
       globalcors:
@@ -48,13 +55,20 @@ spring:
     activate:
       on-profile: prod-gateway
 
+eureka:
+  client:
+    fetch-registry: false
+    register-with-eureka: false
+    service-url:
+      defaultZone: http://144.24.80.74:8761/eureka
+
   cloud:
     gateway:
       globalcors:
         corsConfigurations:
           '[/**]':
             allowedOrigins:
-              - "http://localhost:3000"
+              - "http://144.24.80.74:80"
             allow-credentials: true
             allowedHeaders:
               - x-requested-with
@@ -72,14 +86,14 @@ spring:
               - DELETE
       routes:
         - id: user-server
-          uri: http://localhost:8081
+          uri: http://144.24.80.74:8081
           predicates:
             - Path=/user/**
           filters:
             - Authentication
             - RewritePath=/user/?(?<segment>.*), /$\{segment}
         - id: post-server
-          uri: http://localhost:8082
+          uri: http://144.24.80.74:8082
           predicates:
             - Path=/post/**
           filters:

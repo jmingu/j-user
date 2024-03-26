@@ -40,8 +40,8 @@ spring:
   datasource:
     hikari:
       maximum-pool-size: 4
-    url: jdbc:postgresql://${PG_HOST}:${PG_PORT}/user
-    username: ${PG_USER}
-    password: ${PG_PASSWORD}
+    url: jdbc:postgresql://10.0.1.56:5432/user
+    username: postgres
+    password: 'j1234!@#$'
     plaform: postgres
     driver-class-name: org.postgresql.Driver
