@@ -2,18 +2,10 @@ spring:
   config:
     activate:
       on-profile: local-gateway
-
-eureka:
-  client:
-    fetch-registry: false
-    register-with-eureka: false
-    service-url:
-      defaultZone: http://localhost:8761/eureka
-
   cloud:
     gateway:
       globalcors:
-        corsConfigurations:
+        cors-configurations:
           '[/**]':
             allowedOrigins:
               - "http://localhost:3000"
@@ -48,27 +40,26 @@ eureka:
             - AuthorizationHeaderFilter
             - RewritePath=/post/?(?<segment>.*), /$\{segment}
 
+#eureka:
+#  client:
+#    fetch-registry: false
+#    register-with-eureka: false
+#    service-url:
+#      defaultZone: http://localhost:8761/eureka
+
 
 ---
 spring:
   config:
     activate:
       on-profile: prod-gateway
-
-eureka:
-  client:
-    fetch-registry: false
-    register-with-eureka: false
-    service-url:
-      defaultZone: http://144.24.80.74:8761/eureka
-
   cloud:
     gateway:
       globalcors:
-        corsConfigurations:
+        cors-configurations:
           '[/**]':
             allowedOrigins:
-              - "http://144.24.80.74:80"
+              - "http://144.24.80.74"
             allow-credentials: true
             allowedHeaders:
               - x-requested-with
@@ -90,7 +81,7 @@ eureka:
           predicates:
             - Path=/user/**
           filters:
-            - Authentication
+            - AuthorizationHeaderFilter
             - RewritePath=/user/?(?<segment>.*), /$\{segment}
         - id: post-server
           uri: http://144.24.80.74:8082
@@ -99,4 +90,11 @@ eureka:
           filters:
             - AuthorizationHeaderFilter
             - RewritePath=/post/?(?<segment>.*), /$\{segment}
+
+#eureka:
+#  client:
+#    fetch-registry: false
+#    register-with-eureka: false
+#    service-url:
+#      defaultZone: http://localhost:8761/eureka
 
