@@ -37,5 +37,5 @@ server:
 jwt:
   secret-key: ${SECRET_KEY}
   token-decrypt-key: ${TOKEN_DECRYPT_KEY}
-  expired-time: ${EXPIRED_TIME}
-  expired-refresh-time: ${EXPIRED_REFRESH_TIME}
+  expired-time: 60
+  expired-refresh-time: 10080
