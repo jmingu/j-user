@@ -59,7 +59,7 @@ spring:
         cors-configurations:
           '[/**]':
             allowedOrigins:
-              - "http://144.24.80.74"
+              - ${ALLOWED_ORIGINS}
             allow-credentials: true
             allowedHeaders:
               - x-requested-with
@@ -77,14 +77,14 @@ spring:
               - DELETE
       routes:
         - id: user-server
-          uri: http://144.24.80.74:8081
+          uri: ${USER_SERVER}
           predicates:
             - Path=/user/**
           filters:
             - AuthorizationHeaderFilter
             - RewritePath=/user/?(?<segment>.*), /$\{segment}
         - id: post-server
-          uri: http://144.24.80.74:8082
+          uri: ${POST_SERVER}
           predicates:
             - Path=/post/**
           filters:
