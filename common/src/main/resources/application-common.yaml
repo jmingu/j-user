@@ -8,8 +8,8 @@ server:
 jwt:
   secret-key: jmg_project_application_secret_key  #256bit 넘어야 한다
   token-decrypt-key: j-project--token
-  expired-time: 60 #60분
-  expired-refresh-time: 10080 #7일
+  expired-time: 600 #600분
+  expired-refresh-time: 4320 #3일
 ---
 
 spring:
@@ -22,8 +22,8 @@ server:
 jwt:
   secret-key: jmg_project_application_secret_key  #256bit 넘어야 한다
   token-decrypt-key: j-project--token
-  expired-time: 60 #60분
-  expired-refresh-time: 10080 #7일
+  expired-time: 600 #600분
+  expired-refresh-time: 4320 #3일
 
 ---
 
@@ -35,7 +35,7 @@ server:
   shutdown: graceful
 
 jwt:
-  secret-key: jmg_project_application_secret_key  #256bit 넘어야 한다
-  token-decrypt-key: j-project--token
-  expired-time: 60 #60분
-  expired-refresh-time: 10080 #7일
+  secret-key: ${SECRET_KEY}
+  token-decrypt-key: ${TOKEN_DECRYPT_KEY}
+  expired-time: ${EXPIRED_TIME}
+  expired-refresh-time: ${EXPIRED_REFRESH_TIME}

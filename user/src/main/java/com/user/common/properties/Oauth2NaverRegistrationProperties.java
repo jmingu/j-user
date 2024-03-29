@@ -15,7 +15,4 @@ public class Oauth2NaverRegistrationProperties {
     private String clientId;
     private String clientSecret;
     private String authorizationGrantType;
-    private String clientName;
-    private String redirectUri;
-    private String scope;
 }

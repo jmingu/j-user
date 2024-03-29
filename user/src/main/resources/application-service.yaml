@@ -13,5 +13,5 @@ spring:
       on-profile: prod-service
 
 service:
-  j-post-service: http://144.24.80.74:8082
+  j-post-service: ${POST_SERVER}
 

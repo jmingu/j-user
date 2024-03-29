@@ -43,7 +43,8 @@ public class OAuth2LoginService {
     @Transactional
     public LoginTokenDto getToken(String code, String state) throws Exception {
 
-        ResponseEntity<String> token = nidNaverFeignClient.getToken(oauth2NaverRegistrationProperties.getAuthorizationGrantType(),
+        ResponseEntity<String> token = nidNaverFeignClient.getToken(
+                oauth2NaverRegistrationProperties.getAuthorizationGrantType(),
                 oauth2NaverRegistrationProperties.getClientId(),
                 oauth2NaverRegistrationProperties.getClientSecret(),
                 code,
