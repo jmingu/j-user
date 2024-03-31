@@ -50,6 +50,7 @@ public class JwtUtil {
 
     // Key값 만들기
     private Key getKey(String key) {
+        log.debug("key ==> {}", key);
         byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes); // 시크릿키로 변환
     }
