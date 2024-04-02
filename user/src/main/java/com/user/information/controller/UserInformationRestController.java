@@ -7,6 +7,7 @@ import com.user.information.dto.UserJoinDto;
 import com.user.information.dto.request.UserCreateNickNameRequestDto;
 import com.user.information.dto.request.UserCreateRequestDto;
 import com.user.information.dto.request.UserLoginRequestDto;
+import com.user.information.dto.response.UserListResponseDto;
 import com.user.information.dto.response.UserResponseDto;
 import com.user.information.service.UserInformationService;
 import com.user.sns.dto.response.LoginTokenDto;
@@ -16,7 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -88,6 +91,37 @@ public class UserInformationRestController {
                 .build();
 
         return CommonResponseDto.success(responseDto);
+    }
+
+    /**
+     * 회원정보 조회(user_id List)
+     */
+    @GetMapping("/user/list")
+    public ResponseEntity<CommonResponseDto> findUserIdList(@RequestParam List<Long> userIdList) {
+
+        List<UserDto> userDtoList = userInformationService.findUserIdList(userIdList);
+
+        List<UserResponseDto> userResponseDto = new ArrayList<>();
+        for (UserDto userDto : userDtoList) {
+            UserResponseDto responseDto = UserResponseDto.builder()
+                    .userId(userDto.getUserId())
+                    .loginId(userDto.getLoginId())
+                    .userName(userDto.getUserName())
+                    .nickname(userDto.getNickname())
+                    .email(userDto.getEmail())
+                    .gender(userDto.getGender())
+                    .loginTypeId(userDto.getLoginTypeId())
+                    .build();
+
+            userResponseDto.add(responseDto);
+        }
+
+        UserListResponseDto userList = UserListResponseDto.builder()
+                .userList(userResponseDto)
+                .build();
+
+
+        return CommonResponseDto.success(userList);
     }
 
     /**

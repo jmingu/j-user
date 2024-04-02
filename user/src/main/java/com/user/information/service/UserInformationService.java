@@ -151,10 +151,25 @@ public class UserInformationService {
         if (userJoinDto.getLoginId() == null) {
             throw new JApplicationException("아이디를 확인해 주세요.");
         }
+        else if (userJoinDto.getLoginId().length() == 0) {
+            throw new JApplicationException("아이디를 확인해 주세요.");
+        }
+        else if (userJoinDto.getLoginId().length() < 5 || userJoinDto.getLoginId().length() > 15) {
+            throw new JApplicationException("아이디는 5~15자로 입력해 주세요.");
+        }
         else if (userJoinDto.getPassword() == null) {
             throw new JApplicationException("비밀번호를 확인해 주세요.");
         }
+        else if (userJoinDto.getPassword().length() == 0) {
+            throw new JApplicationException("비밀번호를 확인해 주세요.");
+        }
+        else if (userJoinDto.getPassword().length() < 5 || userJoinDto.getPassword().length() > 20) {
+            throw new JApplicationException("비밀번호는 5~20자로 입력해 주세요.");
+        }
         else if (userJoinDto.getUserName() == null) {
+            throw new JApplicationException("이름을 확인해 주세요.");
+        }
+        else if (userJoinDto.getUserName().length() == 0) {
             throw new JApplicationException("이름을 확인해 주세요.");
         }
         else if (userJoinDto.getGender() == null) {
@@ -199,6 +214,20 @@ public class UserInformationService {
      */
     @Transactional
     public LoginTokenDto userLogin(String loginId, String password) throws Exception {
+
+        if (loginId == null) {
+            throw new JApplicationException("아이디를 확인해 주세요.");
+        }
+        else if (loginId.length() == 0) {
+            throw new JApplicationException("아이디를 확인해 주세요.");
+        }
+        else if (password == null) {
+            throw new JApplicationException("비밀번호를 확인해 주세요.");
+        }
+        else if (password.length() == 0) {
+            throw new JApplicationException("비밀번호를 확인해 주세요.");
+        }
+
         UserEntity userEntity = userInfomationRepository.findByLoginId(loginId);
         if (userEntity == null) {
             log.error("아이디 없음");
