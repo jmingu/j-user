@@ -193,4 +193,15 @@ public class UserInformationRestController {
         return CommonResponseDto.success(loginTokenDto);
     }
 
+    /**
+     * 리프레스 토큰
+     */
+    @PostMapping("/refreshToken")
+    public ResponseEntity<CommonResponseDto> refreshToken(@RequestBody UserLoginRequestDto userLoginRequestDto) throws Exception {
+
+        LoginTokenDto loginTokenDto = userInformationService.userLogin(userLoginRequestDto.getLoginId(), userLoginRequestDto.getPassword());
+
+        return CommonResponseDto.success(loginTokenDto);
+    }
+
 }
