@@ -58,7 +58,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                 if (request.getPath().toString().startsWith("/user/api/oauth/")) {
                     return chain.filter(exchange);
                 }
-
+                log.debug("header ==> {}", request.getHeaders().get("authorization"));
                 final String header = request.getHeaders().get("authorization").get(0);
 
                 // 토큰 가져오기 (Bearer를 뺸다)
