@@ -24,9 +24,10 @@ public class JwtUtil {
     /**
      * 토큰생성
      */
-    public String makeAuthToken(UserEntity userEntity, int tokeTime) {
+    public String makeAuthToken(UserEntity userEntity, int tokeTime, String tokenClf) {
         Claims claims = Jwts.claims();
         claims.put("userId", userEntity.getUserId()+"");
+        claims.put("tokenClf", tokenClf);
 
         // 현재 날짜와 시간 가져오기
         Date currentDate = new Date();
@@ -54,29 +55,5 @@ public class JwtUtil {
         byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes); // 시크릿키로 변환
     }
-
-    /**
-     * 토큰 검증
-     */
-    public boolean isExpired(String token, String key) {
-        // 토큰 시간확인
-        Date expiredDate = Jwts.parserBuilder().setSigningKey(getKey(key)).build().parseClaimsJws(token).getBody().getExpiration(); //body에서 유효시간;
-
-        return expiredDate.before(new Date()); // 현재시간보다 더 전인가
-    }
-
-    // 토큰에서 claims 가져온다
-    private Claims extractClaims(String token, String key) {
-        return Jwts.parserBuilder().setSigningKey(getKey(key)).build().parseClaimsJws(token).getBody(); // body가 나온다
-
-
-    }
-
-    // 토큰에서 정보 가져오기
-    public String getUserName(String token, String key) {
-        return extractClaims(token, key).get("loginId", String.class); //body에서 loginId가져오기
-    }
-
-
 
 }

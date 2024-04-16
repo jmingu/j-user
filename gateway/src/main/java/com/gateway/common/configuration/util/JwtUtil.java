@@ -1,5 +1,6 @@
 package com.gateway.common.configuration.util;
 
+import com.common.exception.JApplicationException;
 import com.common.property.JwtProperty;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -83,6 +84,11 @@ public class JwtUtil {
 
     // 토큰에서 정보 가져오기
     public String getUserName(String token, String key) {
+        String tokenClf = extractClaims(token, key).get("tokenClf", String.class);
+        log.debug("tokenClf ==> {}", tokenClf);
+        if (!"accessToken".equals(tokenClf)) {
+            throw new JApplicationException("허용되지 않은 값이 있습니다.");
+        }
         return extractClaims(token, key).get("userId", String.class); //body에서 userId가져오기
     }
 

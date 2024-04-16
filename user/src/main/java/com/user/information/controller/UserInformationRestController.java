@@ -7,6 +7,7 @@ import com.user.information.dto.UserJoinDto;
 import com.user.information.dto.request.UserCreateNickNameRequestDto;
 import com.user.information.dto.request.UserCreateRequestDto;
 import com.user.information.dto.request.UserLoginRequestDto;
+import com.user.information.dto.request.UserRefreshTokenDto;
 import com.user.information.dto.response.UserListResponseDto;
 import com.user.information.dto.response.UserResponseDto;
 import com.user.information.service.UserInformationService;
@@ -196,12 +197,15 @@ public class UserInformationRestController {
     /**
      * 리프레스 토큰
      */
-    @PostMapping("/refreshToken")
-    public ResponseEntity<CommonResponseDto> refreshToken(@RequestBody UserLoginRequestDto userLoginRequestDto) throws Exception {
+    @PostMapping("/refresh")
+    public ResponseEntity<CommonResponseDto> refreshToken(@RequestBody UserRefreshTokenDto userRefreshTokenDto) throws Exception {
 
-        LoginTokenDto loginTokenDto = userInformationService.userLogin(userLoginRequestDto.getLoginId(), userLoginRequestDto.getPassword());
 
-        return CommonResponseDto.success(loginTokenDto);
+        log.debug("userRefreshTokenDto ==> {}", userRefreshTokenDto);
+//        LoginTokenDto loginTokenDto = userInformationService.userLogin(userLoginRequestDto.getLoginId(), userLoginRequestDto.getPassword());
+        Map result = new HashMap<>();
+        result.put("accessToken", userRefreshTokenDto.getRefreshToken());
+        return CommonResponseDto.success(result);
     }
 
 }
