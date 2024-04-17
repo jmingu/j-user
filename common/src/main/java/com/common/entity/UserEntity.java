@@ -48,6 +48,10 @@ public class UserEntity extends BaseEntity {
         setCreateBy("SYSTEM");
     }
 
+    public UserEntity(Long userId) {
+        this.userId = userId;
+    }
+
 
 //
 //    @PreUpdate

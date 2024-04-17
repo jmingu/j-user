@@ -30,7 +30,8 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             "/post/api/borads",
             "/post/api/comments",
             "/user/api/user/join",
-            "/user/api/user/login"// 로그인 아이디 체크
+            "/user/api/user/login",// 로그인 아이디 체크
+            "/user/api/refresh"
     );
 
     private JwtUtil jwtUtil;

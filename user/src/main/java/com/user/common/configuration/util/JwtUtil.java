@@ -1,8 +1,10 @@
 package com.user.common.configuration.util;
 
 import com.common.entity.UserEntity;
+import com.common.exception.JApplicationException;
 import com.common.property.JwtProperty;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -54,6 +56,39 @@ public class JwtUtil {
         log.debug("key ==> {}", key);
         byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes); // 시크릿키로 변환
+    }
+
+    /**
+     * 토큰 검증
+     */
+    public boolean isExpired(String token, String key) {
+        try {
+            log.debug("token ==> {}", token);
+            // 토큰 시간확인
+            Date expiredDate = Jwts.parserBuilder().setSigningKey(getKey(key)).build().parseClaimsJws(token).getBody().getExpiration(); //body에서 유효시간;
+            log.debug("expiredDate ==> {}", expiredDate);
+            return expiredDate.before(new Date()); // 현재시간보다 더 전인가
+        } catch (ExpiredJwtException e) {
+            // 토큰이 만료되었을 경우 true 반환
+            return true;
+        }
+    }
+
+    // 토큰에서 claims 가져온다
+    private Claims extractClaims(String token, String key) {
+        return Jwts.parserBuilder().setSigningKey(getKey(key)).build().parseClaimsJws(token).getBody(); // body가 나온다
+
+
+    }
+
+    // 토큰에서 정보 가져오기
+    public String getUserName(String token, String key) {
+        String tokenClf = extractClaims(token, key).get("tokenClf", String.class);
+        log.debug("tokenClf ==> {}", tokenClf);
+        if (!"accessToken".equals(tokenClf)) {
+            throw new JApplicationException("허용되지 않은 값이 있습니다.");
+        }
+        return extractClaims(token, key).get("userId", String.class); //body에서 userId가져오기
     }
 
 }
