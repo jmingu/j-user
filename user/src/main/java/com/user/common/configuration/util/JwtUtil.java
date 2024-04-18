@@ -85,7 +85,7 @@ public class JwtUtil {
     public String getUserName(String token, String key) {
         String tokenClf = extractClaims(token, key).get("tokenClf", String.class);
         log.debug("tokenClf ==> {}", tokenClf);
-        if (!"accessToken".equals(tokenClf)) {
+        if (!"refreshToken".equals(tokenClf)) {
             throw new JApplicationException("허용되지 않은 값이 있습니다.");
         }
         return extractClaims(token, key).get("userId", String.class); //body에서 userId가져오기
